@@ -15,3 +15,73 @@ spec:
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
+controlplane $ kubectl run py-calculator-pod --image python:3.8  -- python 
+pod/py-calculator-pod created
+controlplane $ kubectl get pod py-calculator-pod -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: bcd7b66c45757dc3c562db5dd4523a54bbc11ae9bbd9d35f4d5965316f3c783c
+    cni.projectcalico.org/podIP: 192.168.1.7/32
+    cni.projectcalico.org/podIPs: 192.168.1.7/32
+  creationTimestamp: "2024-03-19T14:36:17Z"
+  labels:
+    run: py-calculator-pod
+  name: py-calculator-pod
+  namespace: default
+  resourceVersion: "6643"
+  uid: f301d66f-3c9d-49ee-a3d7-f65c62d77f5e
+spec:
+  containers:
+  - args:
+    - python
+    image: python:3.8
+    imagePullPolicy: IfNotPresent
+    name: py-calculator-pod
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-75kv7
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: node01
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-75kv7
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
